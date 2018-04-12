@@ -22,6 +22,7 @@ function getDetails(id, value, ref)
 
 const database = admin.database().ref('Sensors/');
 const countRef = database.child('count');
+const maxRef = database.child('max');
 
 exports.fetchCount = functions.https.onRequest((request,response)=>{
     console.log('headers: ' + JSON.stringify(request.headers));
@@ -36,14 +37,32 @@ exports.fetchCount = functions.https.onRequest((request,response)=>{
 
     function rush_check(assistanat){
         console.log('inside countFunc');
+		
+		const max = 4;
 
         countRef.once('value',snap=>{
             const carCount = snap.val();
-            console.log(`carCount: ${carCount}`);
+			const currentCarValue = max - carCount;
+            console.log(`currentCarValue: ${currentCarValue}`);
+			
+			var speech;
+			switch(currentCarValue){
+				case 1:
+				
+				case 0: speech = `<speak>Very Unlikely to get a parking spot</speak>`;
+						break;
+				case 4:
+				
+				case 3: speech = `<speak>Very likely to get a parking spot</speak>`;
+										break;
+				
+				case 2: speech = `<speak>Hurry to get a parking spot</speak>`;
+										break;
+			}
 
-            const speech = `<speak>
-            No of cars is  ${snap.val()}
-            </speak>`;
+            //const speech = `<speak>
+            //No of cars is  ${snap.val()}
+            //</speak>`;
 
             assistant.ask(speech)
 
